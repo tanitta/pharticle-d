@@ -3,18 +3,69 @@ import std.math;
 import pharticle;
 import armos;
 
-class TestApp : ar.BaseApp{
-	this(){
-	}
-	
-	void setup(){
-	}
-	
-	void update(){
+struct Point{
+	pharticle.Particle particle;
+	ar.Mesh mesh;
+	this(ar.Vector3d position){
+		particle.position = position;
+		particle.radius = 15;
+		mesh = ar.circlePrimitive(0, 0, 0, 1);
 	}
 	
 	void draw(){
+		ar.pushMatrix;
+			ar.translate(cast(ar.Vector3f)particle.position);
+			ar.scale(particle.radius*0.5);
+			ar.setColor(255, 255, 255);
+			mesh.drawFill;
+			ar.setColor(255, 255, 255);
+		ar.popMatrix;
+	}
+}
+
+class TestApp : ar.BaseApp{
+	pharticle.Engine _engine;
+	Point[] _points;
+	this(){
+		_engine = new pharticle.Engine;
+	}
+	
+	void setup(){
+		ar.targetFps = 30;
+		_engine.unitTime = 0.01;
+		_points = [];
+		_points ~= Point(ar.Vector3d(100, 150, 0));
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 20; y++) {
+				_points ~= Point(ar.Vector3d(x*10, y*10, 0));
+			}
+		}
+		
+		_points[0].particle.isStatic = true;
+	}
+	
+	void update(){
+		for (int i = 0; i < 10; i++) {
+			foreach (ref point; _points) {
+				point.particle.addForce(-point.particle.velocity*0.1);
+				point.particle.addForce(( _points[0].particle.position - point.particle.position )*0.1);
+				point.particle.radius = 15.0 + point.particle.velocity.norm*0.02;
+				_engine.add(point.particle);
+			}
+			_engine.update;
+			
+		}
+	}	
+	
+	void draw(){
 		( ar.fpsUseRate*100 ).writeln;
+		foreach (ref point; _points) {
+			point.draw();
+		}
+	}
+	
+	void mouseMoved(ar.Vector2f position, int button){
+		_points[0].particle.position = ar.Vector3d(position[0], position[1], 0);
 	}
 }
 

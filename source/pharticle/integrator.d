@@ -4,7 +4,7 @@ import armos;
 class Integrator {
 	public{
 		this(){
-			_unitTime = 1.0;
+			_unitTime = 0.1;
 		}
 		
 		void update(ref pharticle.Particle*[] particles){
@@ -25,7 +25,11 @@ class Integrator {
 	private{
 		void euler(ref pharticle.Particle particle){
 			with(particle){
-				velocity = velocity + acceleration * _unitTime;
+				if(isStatic ){
+					velocity = ar.Vector3d(0, 0, 0);
+				}else{
+					velocity = velocity + acceleration * _unitTime;
+				}
 				position = position + velocity * _unitTime;
 				acceleration = ar.Vector3d(0, 0, 0);
 			}

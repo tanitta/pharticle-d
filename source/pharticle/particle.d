@@ -7,4 +7,7 @@ struct Particle{
 	ar.Vector3d velocity;
 	ar.Vector3d acceleration;
 	bool isStatic = false;
+	void addForce(ar.Vector3d force){
+		acceleration = acceleration + force/mass;
+	}
 }

@@ -1,16 +1,23 @@
 module pharticle.collisiondetector;
 import pharticle;
-
+import armos;
 class CollisionDetector{
 	public{
 		this(){
-			_reactionForceFunction = (ref pharticle.Particle, ref pharticle.Particle){};
+			_reactionForceFunction = (ref pharticle.Particle p1, ref pharticle.Particle p2){
+				ar.Vector3d d = p2.position - p1.position;
+				double d_length = d.norm;
+				double depth = d_length - ( p1.radius + p2.radius );
+				if(depth < 0){
+					p2.addForce(- depth*d.normalized*100.0);
+				}
+			};
 		}
 
 		void update(ref pharticle.Particle*[] particlePtrs, ref pharticle.ConstraintPair[] constraintPairs){
 			if( particlePtrs.length > 1 ){
 				_collidableTree = pharticle.CollidableNode(particlePtrs);
-				foreach (particle; particlePtrs) {
+				foreach (ref particle; particlePtrs) {
 					searchTree(particle, _collidableTree, constraintPairs);
 				}
 			}
@@ -49,7 +56,7 @@ class CollisionDetector{
 						detectDetail(particle, node.particles[0], constraintPairs);
 					}
 				}else{
-					foreach (nextNode; node.nextNodes) {
+					foreach (ref nextNode; node.nextNodes) {
 						searchTree(particle, nextNode, constraintPairs);
 					}
 				}
@@ -59,7 +66,7 @@ class CollisionDetector{
 		bool checkParticleIsInBoundingBox(in pharticle.Particle* particle, in pharticle.CollidableNode node)const{
 			bool isInside = true;
 			for (int axis = 0; axis < 3; axis++) {
-				if(particle.position[axis] < node.boxSizeMin[axis] || node.boxSizeMax[axis] < particle.position[axis]){
+				if(particle.position[axis] + particle.radius < node.boxSizeMin[axis] || node.boxSizeMax[axis] < particle.position[axis] - particle.radius){
 					isInside = false;
 				}
 			}
