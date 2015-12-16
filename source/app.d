@@ -9,6 +9,7 @@ struct Point{
 	this(ar.Vector3d position){
 		particle.position = position;
 		particle.radius = 15;
+		particle.mass = 1;
 		mesh = ar.circlePrimitive(0, 0, 0, 1);
 	}
 	
@@ -36,7 +37,7 @@ class TestApp : ar.BaseApp{
 		_points = [];
 		_points ~= Point(ar.Vector3d(100, 150, 0));
 		for (int x = 0; x < 10; x++) {
-			for (int y = 0; y < 20; y++) {
+			for (int y = 0; y < 80; y++) {
 				_points ~= Point(ar.Vector3d(x*10, y*10, 0));
 			}
 		}
@@ -48,8 +49,10 @@ class TestApp : ar.BaseApp{
 		for (int i = 0; i < 10; i++) {
 			foreach (ref point; _points) {
 				point.particle.addForce(-point.particle.velocity*0.1);
-				point.particle.addForce(( _points[0].particle.position - point.particle.position )*0.1);
-				point.particle.radius = 15.0 + point.particle.velocity.norm*0.02;
+				double d = ( _points[0].particle.position - point.particle.position ).norm;
+				point.particle.addForce(( _points[0].particle.position - point.particle.position ).normalized*pow(d, 1.5)*0.001);
+				// point.particle.radius = ar.clamp(15.0 - point.particle.velocity.norm*0.02, 0.1, 100);
+				point.particle.radius =  ar.clamp( 50.0 - ( _points[0].particle.position - point.particle.position ).norm*0.11, 1, 50 )*0.7;
 				_engine.add(point.particle);
 			}
 			_engine.update;
