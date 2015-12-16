@@ -1,9 +1,9 @@
 module pharticle;
-import pharticle.particle;
-import pharticle.collidablenode;
-// import pharticle.constraintpair;
-import pharticle.collisiondetector;
-// import pharticle.constraintsolver;
-// import pharticle.integrator;
-import pharticle.engine;
+public import pharticle.particle;
+public import pharticle.collidablenode;
+public import pharticle.constraintpair;
+public import pharticle.collisiondetector;
+public import pharticle.constraintsolver;
+public import pharticle.integrator;
+public import pharticle.engine;
 
