@@ -60,7 +60,6 @@ class TestApp : ar.BaseApp{
 				double c = (p1.mass * p2.mass)/(p1.mass+p2.mass) * ( (1.0+e) * vab.dotProduct(d.normalized) + cd * depth );
 				p2.addForce( -d.normalized*c);
 				p2.addForce(-vab*0.005);
-				// p2.position = p2.position + d.normalized*depth*0.5;
 			}
 			
 			p2.radius = p2.radius - (p2.radius-p1.radius)/(d_length )*0.01*_engine.unitTime;
@@ -76,7 +75,6 @@ class TestApp : ar.BaseApp{
 				point.particle.addForce(( mousePosition - point.particle.position ).normalized*100.0*point.particle.mass);
 				
 				if(isHeating){
-					// point.particle.radius = ar.clamp(point.particle.radius + ( 170-d )*0.025*_engine.unitTime, 1, 15);
 					point.particle.radius = ar.clamp(point.particle.radius + ( 240.0-d )*0.0025*_engine.unitTime, 1.0, 15.0);
 				}else{
 					point.particle.radius = ar.clamp(point.particle.radius - 0.1, 2, 15);
