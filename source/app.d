@@ -15,9 +15,12 @@ struct Point{
 	
 	void draw(){
 		ar.pushMatrix;
-			ar.translate(cast(ar.Vector3f)particle.position);
-			ar.scale(particle.radius*0.5);
-			ar.setColor(255, 255, 255);
+			ar.Vector3f polyPosition = cast(ar.Vector3f)particle.position;
+			polyPosition[2] = -particle.radius;
+			ar.translate(polyPosition);
+			ar.scale(particle.radius*1.0);
+			auto c = ar.map(particle.radius, 1.0, 15.0, 0.0, 255.0);
+			ar.setColor(c);
 			mesh.drawFill;
 			ar.setColor(255, 255, 255);
 		ar.popMatrix;
@@ -27,36 +30,62 @@ struct Point{
 class TestApp : ar.BaseApp{
 	pharticle.Engine _engine;
 	Point[] _points;
+	ar.Vector3d mousePosition = ar.Vector3d(0, 0, 0);
+	bool isHeating = true;
 	this(){
 		_engine = new pharticle.Engine;
 	}
 	
 	void setup(){
+		ar.enableDepthTest;
+		ar.disableFbo;
 		ar.targetFps = 30;
-		_engine.unitTime = 0.01;
+		_engine.unitTime = 0.05;
+		
 		_points = [];
-		_points ~= Point(ar.Vector3d(100, 150, 0));
-		for (int x = 0; x < 10; x++) {
-			for (int y = 0; y < 80; y++) {
-				_points ~= Point(ar.Vector3d(x*10, y*10, 0));
+		for (int x = 0; x < 70; x++) {
+			for (int y = 0; y < 70; y++) {
+				_points ~= Point(ar.Vector3d(x*10+10, y*10+10, 0));
 			}
 		}
 		
-		_points[0].particle.isStatic = true;
+		_engine.setReactionForceFunction = (ref pharticle.Particle p1, ref pharticle.Particle p2){
+			ar.Vector3d d = p2.position - p1.position;
+			double d_length = d.norm;
+			double depth = d_length - ( p1.radius + p2.radius );
+			if(depth < 0){
+				ar.Vector3d vab = p2.velocity - p1.velocity;
+				double cd = 50;
+				double e = 0.0;
+				double c = (p1.mass * p2.mass)/(p1.mass+p2.mass) * ( (1.0+e) * vab.dotProduct(d.normalized) + cd * depth );
+				p2.addForce( -d.normalized*c);
+				p2.addForce(-vab*0.005);
+				// p2.position = p2.position + d.normalized*depth*0.5;
+			}
+			
+			p2.radius = p2.radius - (p2.radius-p1.radius)/(d_length )*0.01*_engine.unitTime;
+		};
+
 	}
 	
 	void update(){
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 1; i++) {
 			foreach (ref point; _points) {
-				point.particle.addForce(-point.particle.velocity*0.1);
-				double d = ( _points[0].particle.position - point.particle.position ).norm;
-				point.particle.addForce(( _points[0].particle.position - point.particle.position ).normalized*pow(d, 1.5)*0.001);
-				// point.particle.radius = ar.clamp(15.0 - point.particle.velocity.norm*0.02, 0.1, 100);
-				point.particle.radius =  ar.clamp( 50.0 - ( _points[0].particle.position - point.particle.position ).norm*0.11, 1, 50 )*0.7;
+				point.particle.addForce(-point.particle.velocity*0.5);
+				double d = ( mousePosition - point.particle.position ).norm;
+				point.particle.addForce(( mousePosition - point.particle.position ).normalized*100.0*point.particle.mass);
+				
+				if(isHeating){
+					// point.particle.radius = ar.clamp(point.particle.radius + ( 170-d )*0.025*_engine.unitTime, 1, 15);
+					point.particle.radius = ar.clamp(point.particle.radius + ( 240.0-d )*0.0025*_engine.unitTime, 1.0, 15.0);
+				}else{
+					point.particle.radius = ar.clamp(point.particle.radius - 0.1, 2, 15);
+				}
+				
 				_engine.add(point.particle);
 			}
-			_engine.update;
 			
+			_engine.update;
 		}
 	}	
 	
@@ -67,8 +96,12 @@ class TestApp : ar.BaseApp{
 		}
 	}
 	
-	void mouseMoved(ar.Vector2f position, int button){
-		_points[0].particle.position = ar.Vector3d(position[0], position[1], 0);
+	void keyPressed(int key){
+		isHeating = !isHeating;
+	}
+	
+	void mousePressed(ar.Vector2f position, int button){
+		mousePosition = ar.Vector3d(position[0], position[1], 0);
 	}
 }
 
