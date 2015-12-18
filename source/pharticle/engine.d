@@ -42,6 +42,10 @@ class Engine {
 		double unitTime()const{
 			return _integrator.unitTime;
 		}
+		
+		void setReactionForceFunction(void delegate(ref pharticle.Particle, ref pharticle.Particle) func){
+			_collisionDetector.setReactionForceFunction(func);
+		}
 	}
 	
 	private{

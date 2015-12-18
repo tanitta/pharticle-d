@@ -5,12 +5,8 @@ class CollisionDetector{
 	public{
 		this(){
 			_reactionForceFunction = (ref pharticle.Particle p1, ref pharticle.Particle p2){
-				ar.Vector3d d = p2.position - p1.position;
-				double d_length = d.norm;
-				double depth = d_length - ( p1.radius + p2.radius );
-				if(depth < 0){
-					p2.addForce(- depth*d.normalized*100.0);
-				}
+				auto d =  p2.position-p1.position;
+				p2.addForce(-d.normalized*(d.norm-(p1.radius+p2.radius))*10);
 			};
 		}
 
