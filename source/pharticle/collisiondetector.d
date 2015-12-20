@@ -10,7 +10,7 @@ class CollisionDetector{
 			};
 		}
 
-		void update(ref pharticle.Particle*[] particlePtrs, ref pharticle.ConstraintPair[] constraintPairs){
+		void update(ref pharticle.Particle[] particlePtrs, ref pharticle.ConstraintPair[] constraintPairs){
 			if( particlePtrs.length > 1 ){
 				_collidableTree = pharticle.CollidableNode(particlePtrs);
 				foreach (ref particle; particlePtrs) {
@@ -29,7 +29,7 @@ class CollisionDetector{
 			particlePtrs[1].position = ar.Vector3d(1, 0, 0);
 			particlePtrs[2].position = ar.Vector3d(9, 0, 0);
 			particlePtrs[3].position = ar.Vector3d(10, 0, 0);
-			
+
 			auto collisionDetector = new pharticle.CollisionDetector();
 			pharticle.ConstraintPair[] constraintPairs;
 			collisionDetector.update(particlePtrs, constraintPairs);
@@ -44,8 +44,8 @@ class CollisionDetector{
 	private{
 		pharticle.CollidableNode _collidableTree;
 		void delegate(ref pharticle.Particle, ref pharticle.Particle) _reactionForceFunction;
-		
-		void searchTree(ref pharticle.Particle* particle, ref pharticle.CollidableNode node, ref pharticle.ConstraintPair[] constraintPairs){
+
+		void searchTree(ref pharticle.Particle particle, ref pharticle.CollidableNode node, ref pharticle.ConstraintPair[] constraintPairs){
 			if(checkParticleIsInBoundingBox(particle, node)){
 				if (node.isLeef) {
 					if(particle != node.particles[0] ){
@@ -59,7 +59,7 @@ class CollisionDetector{
 			}
 		};
 
-		bool checkParticleIsInBoundingBox(in pharticle.Particle* particle, in pharticle.CollidableNode node)const{
+		bool checkParticleIsInBoundingBox(in pharticle.Particle particle, in pharticle.CollidableNode node)const{
 			bool isInside = true;
 			for (int axis = 0; axis < 3; axis++) {
 				if(particle.position[axis] + particle.radius < node.boxSizeMin[axis] || node.boxSizeMax[axis] < particle.position[axis] - particle.radius){
@@ -69,7 +69,7 @@ class CollisionDetector{
 			return isInside;
 		}
 
-		void detectDetail(ref pharticle.Particle* particle1, ref pharticle.Particle* particle2, ref pharticle.ConstraintPair[] constraintPairs){
+		void detectDetail(ref pharticle.Particle particle1, ref pharticle.Particle particle2, ref pharticle.ConstraintPair[] constraintPairs){
 			bool isColliding= ( particle1.position - particle2.position ).norm < particle1.radius + particle2.radius;
 			if(isColliding){
 				constraintPairs ~= pharticle.ConstraintPair(particle1, particle2, _reactionForceFunction);
