@@ -8,7 +8,7 @@ struct CollidableNode{
 		ar.Vector3d boxSizeMin()const{return _boxSizeMin;};
 		ar.Vector3d boxSizeMax()const{return _boxSizeMax;};
 		CollidableNode[] nextNodes(){return _nextNodes;}
-		pharticle.Particle*[] particles(){return _particlePtrs;}
+		pharticle.Particle[] particles(){return _particlePtrs;}
 		ulong numNextNodes()const{return _nextNodes.length;}
 		ulong numParticles()const{return _particlePtrs.length;}
 		bool isLeef()const{return ( numParticles == 1 ); }
@@ -17,8 +17,8 @@ struct CollidableNode{
 			assert(node.boxSizeMin== ar.Vector3d(0, 0, 0));
 			assert(node.boxSizeMax == ar.Vector3d(0, 0, 0));
 		}
-		
-		this(ref pharticle.Particle*[] particlePtrs){
+
+		this(pharticle.Particle[] particlePtrs){
 			_particlePtrs = particlePtrs;
 			fitBox();
 			if(particlePtrs.length > 1){
@@ -27,7 +27,7 @@ struct CollidableNode{
 			}
 		}
 		unittest{
-			pharticle.Particle*[] particlePtrs;
+			pharticle.Particle[] particlePtrs;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
@@ -43,13 +43,13 @@ struct CollidableNode{
 			assert( node.nextNodes[1].numParticles == 2);
 		}
 	}
-	
+
 	private{
 		ar.Vector3d _boxSizeMin;
 		ar.Vector3d _boxSizeMax;
-		pharticle.Particle*[] _particlePtrs;
+		pharticle.Particle[] _particlePtrs;
 		CollidableNode[] _nextNodes;
-		
+
 		int mostLargeAxis()const{
 			int most_large_axis = 0;
 			double distance = _boxSizeMax[0] - _boxSizeMin[0];
@@ -63,7 +63,7 @@ struct CollidableNode{
 			return most_large_axis;
 		}
 		unittest{
-			pharticle.Particle*[] particlePtrs;
+			pharticle.Particle[] particlePtrs;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
@@ -77,15 +77,15 @@ struct CollidableNode{
 			assert( node.nextNodes[0].mostLargeAxis == 1);
 			assert( node.nextNodes[1].mostLargeAxis == 1);
 		}
-		
+
 		void fitBox(){
 			_boxSizeMin = _particlePtrs[0].position - _particlePtrs[0].radius;
 			_boxSizeMax = _particlePtrs[0].position + _particlePtrs[0].radius;
-			
+
 			foreach (particle; _particlePtrs) {
 				auto currentMin = particle.position - particle.radius;
 				auto currentMax = particle.position + particle.radius;
-				
+
 				for (int axis = 0; axis < 3; axis++) {
 					if(currentMin[axis] < _boxSizeMin[axis]){
 						_boxSizeMin[axis] = currentMin[axis];
@@ -97,7 +97,7 @@ struct CollidableNode{
 			}
 		}
 		unittest{
-			pharticle.Particle*[] particlePtrs;
+			pharticle.Particle[] particlePtrs;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
@@ -110,15 +110,15 @@ struct CollidableNode{
 			assert( node.boxSizeMin == ar.Vector3d(-1, -1, -1));
 			assert( node.boxSizeMax == ar.Vector3d(1, 4, 1));
 		}
-		
+
 		void sortParticles(in int axis){
-			bool less(pharticle.Particle* a, pharticle.Particle* b){
+			bool less(pharticle.Particle a, pharticle.Particle b){
 				return a.position[axis] < b.position[axis];
 			}
 			sort!(less)(_particlePtrs);
 		}
 		unittest{
-			pharticle.Particle*[] particlePtrs;
+			pharticle.Particle[] particlePtrs;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
@@ -133,23 +133,14 @@ struct CollidableNode{
 			assert( node.particles[2].position == ar.Vector3d(0, 2, 0) );
 			assert( node.particles[3].position == ar.Vector3d(0, 3, 0) );
 		}
-		
+
 		void devideParticles(in int axis){
-			auto splitLength = _particlePtrs.length/2;
-			pharticle.Particle*[] splitedParticlePtrs1;
-			pharticle.Particle*[] splitedParticlePtrs2;
-			for (ulong i = 0; i < _particlePtrs.length;i++){
-				if(i < splitLength){
-					splitedParticlePtrs1 ~= _particlePtrs[i];
-				}else{
-					splitedParticlePtrs2 ~= _particlePtrs[i];
-				}
-			}
-			_nextNodes ~= CollidableNode(splitedParticlePtrs1);
-			_nextNodes ~= CollidableNode(splitedParticlePtrs2);
+			auto splitLength = _particlePtrs.length / 2;
+			_nextNodes ~= CollidableNode(_particlePtrs[0 .. splitLength]);
+			_nextNodes ~= CollidableNode(_particlePtrs[splitLength .. $]);
 		};
 		unittest{
-			pharticle.Particle*[] particlePtrs;
+			pharticle.Particle[] particlePtrs;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;

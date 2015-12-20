@@ -6,22 +6,22 @@ class Integrator {
 		this(){
 			_unitTime = 0.1;
 		}
-		
-		void update(ref pharticle.Particle*[] particles){
+
+		void update(ref pharticle.Particle[] particles){
 			foreach (particle; particles) {
-				euler(*particle);
+				euler(particle);
 			}
 		}
-		
+
 		void unitTime(double time){
 			_unitTime = time;
 		}
-		
+
 		double unitTime()const{
 			return _unitTime;
 		}
 	}
-	
+
 	private{
 		void euler(ref pharticle.Particle particle){
 			with(particle){
@@ -34,7 +34,7 @@ class Integrator {
 				acceleration = ar.Vector3d(0, 0, 0);
 			}
 		}
-		
+
 		double _unitTime;
 	}
 }
