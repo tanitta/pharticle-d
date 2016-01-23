@@ -19,6 +19,10 @@ struct ConstraintPair {
 		void adaptForce(){
 			_forceFunction(*( particles[0] ), *( particles[1] ));
 		}
+		
+		pharticle.Particle*[2] particlePtrs(){
+			return _particlePtrs;
+		};
 	}
 	
 	private{

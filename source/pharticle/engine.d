@@ -14,8 +14,24 @@ class Engine {
 			_constraintSolver.update(_constraintPairs);
 			_integrator.update(_particles);
 
-			_particles.length = 0;
-			_constraintPairs.length = 0;
+			// _particles.length = 0;
+			// _constraintPairs.length = 0;
+			if( _isAutoClear ){
+				clear;
+			}
+		}
+		
+		bool isAutoClear(){
+			return _isAutoClear;
+		}
+		
+		void isAutoClear(bool f){
+			_isAutoClear = f;
+		}
+		
+		void clear(){
+			_particles = [];
+			_constraintPairs = [];
 		}
 
 		void add(pharticle.Particle p){
@@ -46,6 +62,10 @@ class Engine {
 		void setReactionForceFunction(void delegate(ref pharticle.Particle, ref pharticle.Particle) func){
 			_collisionDetector.setReactionForceFunction(func);
 		}
+		
+		pharticle.ConstraintPair[] constraintPairs(){
+			return _constraintPairs;
+		};
 	}
 
 	private{
@@ -56,5 +76,6 @@ class Engine {
 		pharticle.Particle[] _particles;
 		pharticle.ConstraintPair[] _constraintPairs;
 		double _unitTime;
+		bool _isAutoClear = true;
 	}
 }
