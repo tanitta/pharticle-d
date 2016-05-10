@@ -54,7 +54,7 @@ struct CollidableNode{
 			int most_large_axis = 0;
 			double distance = _boxSizeMax[0] - _boxSizeMin[0];
 			for(int axis = 1; axis < 3; axis++){
-				auto currentDistance = _boxSizeMax[axis] - _boxSizeMin[axis];
+				immutable currentDistance = _boxSizeMax[axis] - _boxSizeMin[axis];
 				if (currentDistance>distance) {
 					distance = currentDistance;
 					most_large_axis = axis;
@@ -83,8 +83,8 @@ struct CollidableNode{
 			_boxSizeMax = _particlePtrs[0].position + _particlePtrs[0].radius;
 
 			foreach (particle; _particlePtrs) {
-				auto currentMin = particle.position - particle.radius;
-				auto currentMax = particle.position + particle.radius;
+				immutable currentMin = particle.position - particle.radius;
+				immutable currentMax = particle.position + particle.radius;
 
 				for (int axis = 0; axis < 3; axis++) {
 					if(currentMin[axis] < _boxSizeMin[axis]){
@@ -135,7 +135,7 @@ struct CollidableNode{
 		}
 
 		void devideParticles(in int axis){
-			auto splitLength = _particlePtrs.length / 2;
+			immutable splitLength = _particlePtrs.length / 2;
 			_nextNodes ~= CollidableNode(_particlePtrs[0 .. splitLength]);
 			_nextNodes ~= CollidableNode(_particlePtrs[splitLength .. $]);
 		};

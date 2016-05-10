@@ -19,19 +19,22 @@ struct Point{
 			ar.Vector3f polyPosition = cast(ar.Vector3f)particle.position;
 			polyPosition[2] = -particle.radius;
 			ar.translate(polyPosition);
-			ar.scale(particle.radius*1.0);
-			auto c = ar.map(particle.radius, min, max, 0.0, 255.0);
-			// ar.setColor(c, 0, 0, 255-c);
-			ar.setColor(c, 0, 0, 32);
 			
-			ar.pushMatrix;
-				ar.scale(particle.radius/256.0, particle.radius/256.0, 1.0);
+			auto c = ar.map(particle.radius, min, max, 0.0, 255.0);
+			// ar.setColor(c, 0, 0, 32);
+			
+			ar.scale(particle.radius*1.0);
+			// ar.pushMatrix;
+			// 	ar.scale(particle.radius*1.0);
+				ar.setColor(c, 0, 0, ( 255.0-c*200.0/255.0 ));
 				ar.pushMatrix;
-				ar.translate(-img.width/2, -img.height/2, 0);
+					ar.scale(4.0/cast(float)( img.width ), 4.0/cast(float)( img.height ), 1.0);
+					ar.scale(0.1, 0.1, 1.0);
+					ar.translate(-img.width/2, -img.height/2, 0);
 					img.draw(0, 0);
 				ar.popMatrix;
-			ar.popMatrix;
-			// mesh.drawFill;
+			// ar.popMatrix;
+			mesh.drawFill;
 			ar.setColor(255, 255, 255);
 		ar.popMatrix;
 	}
@@ -137,11 +140,10 @@ class TestApp : ar.BaseApp{
 
 	void draw(){
 		// ar.enableDepthTest;
-		( ar.fpsUseRate*100 ).writeln;
+		// ( ar.fpsUseRate*100 ).writeln;
 		foreach (ref point; _points) {
 			point.draw(guiHeatingMin, guiHeatingMax, image);
 		}
-		( _engine.constraintPairs.length ).writeln;
 		foreach (ref pair; _engine.constraintPairs) {
 			double radiusAvg = ( pair.particlePtrs[0].radius+pair.particlePtrs[1].radius )*0.5;
 			auto c = ar.map(radiusAvg, guiHeatingMin, guiHeatingMax, 0.0, 255.0);
@@ -152,6 +154,7 @@ class TestApp : ar.BaseApp{
 		gui.draw;
 		// ar.enableDepthTest;
 		_engine.clear;
+		image.height.writeln;
 	}
 }
 

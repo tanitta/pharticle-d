@@ -5,7 +5,7 @@ class CollisionDetector{
 	public{
 		this(){
 			_reactionForceFunction = (ref pharticle.Particle p1, ref pharticle.Particle p2){
-				auto d =  p2.position-p1.position;
+				immutable d =  p2.position-p1.position;
 				p2.addForce(-d.normalized*(d.norm-(p1.radius+p2.radius))*10);
 			};
 		}
@@ -20,7 +20,7 @@ class CollisionDetector{
 		};
 		unittest{
 			import armos;
-			pharticle.Particle*[] particlePtrs;
+			pharticle.Particle[] particlePtrs;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
 			particlePtrs ~= new pharticle.Particle;
