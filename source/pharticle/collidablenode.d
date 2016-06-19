@@ -12,11 +12,6 @@ struct CollidableNode{
 		ulong numNextNodes()const{return _nextNodes.length;}
 		ulong numParticles()const{return _particlePtrs.length;}
 		bool isLeef()const{return ( numParticles == 1 ); }
-		unittest{
-			auto node = CollidableNode();
-			assert(node.boxSizeMin== ar.Vector3d(0, 0, 0));
-			assert(node.boxSizeMax == ar.Vector3d(0, 0, 0));
-		}
 
 		this(pharticle.Particle[] particlePtrs){
 			_particlePtrs = particlePtrs;
